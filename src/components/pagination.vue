@@ -3,20 +3,38 @@
   text-align: center;
   font-size: 18px;
   margin-top: 180px;
-
+  position: relative;
+  .prev-wrap, .next-wrap{
+    position: absolute;
+    top: 0;
+  }
+  .prev-wrap{
+    left: 0;
+  }
+  .next-wrap{
+    right: 0;
+  }
   ul {
     display: inline-block;
     list-style: none;
     overflow: hidden;
-
+    
     li {
       float: left;
       color: #1e5a6b;
-      padding: 1px 10px;
-      margin: 0 5px;
+      padding: 1px 8px;
+      // margin: 0 5px;
       border-radius: 50%;
       user-select: none;
       border: 1px solid transparent;
+    }
+  }
+  .page-num-wrap{
+    width: 250px;
+    display: flex;
+    margin: 0 auto;
+    li{
+      flex: 1;
     }
   }
 
@@ -48,23 +66,23 @@
 
 <template>
 <div class="page-wrap">
-  <ul v-show="prePage" class="li-page" @click="goPrePage">上一页</ul>
-  <ul>
+  <ul :class="{disabled: prePage}" class="li-page prev-wrap" @click="goPrePage">上一页</ul>
+  <ul class="page-num-wrap">
     <li v-for="i, index in showPageBtn" :key="index" :class="{active: i === currentPage, pointer: i, hover: i && i !== currentPage}"
         @click="pageOffset(i)">
       <a v-if="i" class="notPointer">{{i}}</a>
       <a v-else>···</a>
     </li>
   </ul>
-  <ul v-show="nextPage" class="li-page" @click="goNextPage">下一页</ul>
+  <ul :class="{disabled: nextPage}" class="li-page next-wrap" @click="goNextPage">下一页</ul>
 </div>
 </template>
 
 <script>
 export default {
   data: () => ({
-    num: 30,
-    limit: 3
+    num: 40, // 数据总条数
+    limit: 3 // 每页显示的数据条数
   }),
 
   computed: {
@@ -108,11 +126,26 @@ export default {
     },
 
     goPrePage () {
+      console.log(this.offset);
+      if(this.offset < this.limit){
+        console.log('第一页');
+        return;
+      }
+      // console.log(this.prePage);
+      // if (this.prePage) {
+      //   console.log('已经是第一页');
+      //   return;
+      // }
       this.$store.commit('PRE_PAGE', this.limit)
       this.$emit('getNew')
     },
 
     goNextPage () {
+      console.log(this.offset);
+      if(this.offset < this.num && this.offset > this.num - this.limit){
+        console.log('最后一页');
+        return;
+      }
       this.$store.commit('NEXT_PAGE', this.limit)
       this.$emit('getNew')
     }
