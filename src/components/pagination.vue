@@ -7,6 +7,8 @@
   .prev-wrap, .next-wrap{
     position: absolute;
     top: 0;
+    height: 30px;
+    line-height: 30px;
   }
   .prev-wrap{
     left: 0;
@@ -18,23 +20,22 @@
     display: inline-block;
     list-style: none;
     overflow: hidden;
-    
     li {
-      float: left;
       color: #1e5a6b;
-      padding: 1px 8px;
-      // margin: 0 5px;
-      border-radius: 50%;
+      border-radius: 5px;
       user-select: none;
       border: 1px solid transparent;
     }
   }
   .page-num-wrap{
-    width: 250px;
+    max-width: 220px;
     display: flex;
     margin: 0 auto;
+    justify-content: space-between;
     li{
-      flex: 1;
+      height: 30px;
+      line-height: 30px;
+      flex: 0 0 30px;
     }
   }
 
@@ -49,12 +50,9 @@
   }
 
   .li-page {
-    line-height: 1.5;
-    cursor: pointer;
     color: #1e5a6b;
-
-    &:hover {
-      color: #7ba6b3;
+    &.disabled {
+      color:red;
     }
   }
 
@@ -66,7 +64,7 @@
 
 <template>
 <div class="page-wrap">
-  <ul :class="{disabled: prePage}" class="li-page prev-wrap" @click="goPrePage">上一页</ul>
+  <span :class="{disabled: !prePage}" class="li-page prev-wrap" @click="goPrePage">上一页</span>
   <ul class="page-num-wrap">
     <li v-for="i, index in showPageBtn" :key="index" :class="{active: i === currentPage, pointer: i, hover: i && i !== currentPage}"
         @click="pageOffset(i)">
@@ -74,7 +72,7 @@
       <a v-else>···</a>
     </li>
   </ul>
-  <ul :class="{disabled: nextPage}" class="li-page next-wrap" @click="goNextPage">下一页</ul>
+  <span :class="{disabled: !nextPage}" class="li-page next-wrap" @click="goNextPage">下一页</span>
 </div>
 </template>
 
@@ -82,7 +80,7 @@
 export default {
   data: () => ({
     num: 40, // 数据总条数
-    limit: 3 // 每页显示的数据条数
+    limit: 5 // 每页显示的数据条数
   }),
 
   computed: {
@@ -105,11 +103,10 @@ export default {
     currentPage () {
       return Math.ceil(this.offset / this.limit) + 1
     },
-
     showPageBtn () {
       const pageNum = this.totalPage
       const index = this.currentPage
-      if (pageNum <= 5) return [...new Array(5)].map((v, i) => i + 1)
+      if (pageNum <= 5) return [...new Array(pageNum)].map((v, i) => i + 1)
       if (index <= 2) return [1, 2, 3, 0, pageNum]
       if (index >= pageNum - 1) return [1, 0, pageNum - 2, pageNum - 1, pageNum]
       if (index === 3) return [1, 2, 3, 4, 0, pageNum]
@@ -127,22 +124,17 @@ export default {
 
     goPrePage () {
       console.log(this.offset);
-      if(this.offset < this.limit){
+      if(!this.prePage){
         console.log('第一页');
         return;
       }
-      // console.log(this.prePage);
-      // if (this.prePage) {
-      //   console.log('已经是第一页');
-      //   return;
-      // }
       this.$store.commit('PRE_PAGE', this.limit)
       this.$emit('getNew')
     },
 
     goNextPage () {
       console.log(this.offset);
-      if(this.offset < this.num && this.offset > this.num - this.limit){
+      if (!this.nextPage) {
         console.log('最后一页');
         return;
       }
