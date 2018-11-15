@@ -67,13 +67,15 @@
 <template>
 <div class="page-wrap">
   <ul :class="{disabled: prePage}" class="li-page prev-wrap" @click="goPrePage">上一页</ul>
+  <span>首页</span>
   <ul class="page-num-wrap">
-    <li v-for="i, index in showPageBtn" :key="index" :class="{active: i === currentPage, pointer: i, hover: i && i !== currentPage}"
+    <li v-for="(i, index) in showPageBtn" :key="index" :class="{active: i === currentPage, pointer: i, hover: i && i !== currentPage}"
         @click="pageOffset(i)">
       <a v-if="i" class="notPointer">{{i}}</a>
       <a v-else>···</a>
     </li>
   </ul>
+  <span>尾页</span>
   <ul :class="{disabled: nextPage}" class="li-page next-wrap" @click="goNextPage">下一页</ul>
 </div>
 </template>
@@ -128,7 +130,7 @@ export default {
     goPrePage () {
       console.log(this.offset);
       if(this.offset < this.limit){
-        console.log('第一页');
+        console.log('已经是第一页');
         return;
       }
       // console.log(this.prePage);
